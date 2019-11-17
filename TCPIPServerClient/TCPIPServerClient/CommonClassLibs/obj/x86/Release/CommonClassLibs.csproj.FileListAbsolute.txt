@@ -1,0 +1,5 @@
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\CommonClassLibs\bin\x86\Release\CommonClassLibs.dll
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\CommonClassLibs\bin\x86\Release\CommonClassLibs.pdb
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\CommonClassLibs\obj\x86\Release\CommonClassLibs.csprojAssemblyReference.cache
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\CommonClassLibs\obj\x86\Release\CommonClassLibs.dll
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\CommonClassLibs\obj\x86\Release\CommonClassLibs.pdb

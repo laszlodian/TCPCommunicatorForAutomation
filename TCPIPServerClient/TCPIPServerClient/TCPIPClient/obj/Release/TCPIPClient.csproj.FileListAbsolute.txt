@@ -1,0 +1,1 @@
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPClient\obj\Release\TCPIPClient.csprojAssemblyReference.cache

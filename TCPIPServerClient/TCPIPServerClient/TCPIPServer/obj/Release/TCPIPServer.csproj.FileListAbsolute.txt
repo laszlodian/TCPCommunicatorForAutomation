@@ -1,0 +1,11 @@
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\obj\Release\TCPIPServer.frmServer.resources
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\obj\Release\TCPIPServer.Properties.Resources.resources
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\obj\Release\TCPIPServer.csproj.GenerateResource.cache
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\bin\Release\TCPIPServer.exe.config
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\bin\Release\TCPIPServer.exe
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\bin\Release\TCPIPServer.pdb
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\bin\Release\CommonClassLibs.dll
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\bin\Release\CommonClassLibs.pdb
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\obj\Release\TCPIPServer.csproj.CopyComplete
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\obj\Release\TCPIPServer.exe
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\obj\Release\TCPIPServer.pdb
