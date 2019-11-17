@@ -41,14 +41,7 @@ D:\MyDocuments\Visual Studio 2015\Projects\TCPIPServerClient\TCPIPServer\bin\Deb
 D:\MyDocuments\Visual Studio 2015\Projects\TCPIPServerClient\TCPIPServer\bin\Debug\TCPIPServer.pdb
 D:\MyDocuments\Visual Studio 2015\Projects\TCPIPServerClient\TCPIPServer\bin\Debug\CommonClassLibs.dll
 D:\MyDocuments\Visual Studio 2015\Projects\TCPIPServerClient\TCPIPServer\bin\Debug\CommonClassLibs.pdb
-D:\TCPIPServerClient\TCPIPServer\bin\Debug\TCPIPServer.exe.config
-D:\TCPIPServerClient\TCPIPServer\bin\Debug\TCPIPServer.exe
-D:\TCPIPServerClient\TCPIPServer\bin\Debug\TCPIPServer.pdb
-D:\TCPIPServerClient\TCPIPServer\bin\Debug\CommonClassLibs.dll
-D:\TCPIPServerClient\TCPIPServer\bin\Debug\CommonClassLibs.pdb
-D:\TCPIPServerClient\TCPIPServer\obj\Debug\TCPIPServer.frmServer.resources
-D:\TCPIPServerClient\TCPIPServer\obj\Debug\TCPIPServer.Properties.Resources.resources
-D:\TCPIPServerClient\TCPIPServer\obj\Debug\TCPIPServer.csproj.GenerateResource.cache
-D:\TCPIPServerClient\TCPIPServer\obj\Debug\TCPIPServer.csproj.CopyComplete
-D:\TCPIPServerClient\TCPIPServer\obj\Debug\TCPIPServer.exe
-D:\TCPIPServerClient\TCPIPServer\obj\Debug\TCPIPServer.pdb
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\obj\Debug\TCPIPServer.csprojAssemblyReference.cache
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\obj\Debug\TCPIPServer.frmServer.resources
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\obj\Debug\TCPIPServer.Properties.Resources.resources
+D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPServer\obj\Debug\TCPIPServer.csproj.GenerateResource.cache

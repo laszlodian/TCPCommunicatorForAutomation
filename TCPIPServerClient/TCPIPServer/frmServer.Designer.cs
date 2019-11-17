@@ -185,7 +185,7 @@
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.groupBox2);
             this.Name = "frmServer";
-            this.Text = "TCPiP Server App";
+            this.Text = string.Format("{0} | {1} | {2}", Text, Properties.Settings.Default.ServerUserName, Properties.Settings.Default.ServerIP);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmServer_FormClosing);
             this.Load += new System.EventHandler(this.frmServer_Load);
             this.groupBox2.ResumeLayout(false);

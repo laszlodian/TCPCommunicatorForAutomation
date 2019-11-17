@@ -27,29 +27,22 @@ namespace TCPIPServer
             CLR_GREEN = 3,
             CLR_PURPLE = 4
         }
-        
+
+        #region Variables
         private bool ValidBrowser = false;
         private bool displayReady = false;
-
-        bool ServerIsExiting = false;
-        int MyPort = 9999;
-
-        /*******************************************************/
-        /// <summary>
-        /// TCPiP server
-        /// </summary>
-        Server svr = null;
-
+        private bool ServerIsExiting = false;
+        private int MyPort = 9999;
+        private Server svr = null;
         private Dictionary<int, MotherOfRawPackets> dClientRawPacketList = null;
         private Queue<FullPacket> FullPacketList = null;
-        static AutoResetEvent autoEvent;//mutex
-        static AutoResetEvent autoEvent2;//mutex
+        private static AutoResetEvent autoEvent;//mutex
+        private static AutoResetEvent autoEvent2;//mutex
         private Thread DataProcessThread = null;
         private Thread FullPacketDataProcessThread = null;
-        /*******************************************************/
-
-        System.Timers.Timer timerGarbagePatrol = null;
-        System.Timers.Timer timerPing = null;
+        private System.Timers.Timer timerGarbagePatrol = null;
+        private System.Timers.Timer timerPing = null; 
+        #endregion
 
         public frmServer()
         {
@@ -58,39 +51,21 @@ namespace TCPIPServer
 
         private void frmServer_Load(object sender, EventArgs e)
         {
-            /**********************************************/
-            // Init the communications window so we cann whats going on
-            ValidBrowser = BrowserVersion();
-            // Setup data monitor
-            CommunicationsDisplay.Navigate("about:blank");
-
-            OnCommunications($"Loading... {GeneralFunction.GetDateTimeFormatted}", INK.CLR_BLUE);
-            /**********************************************/
-
-            /**********************************************/
-            //Create a directory we can write stuff too
-            CheckOnApplicationDirectory();
-            /**********************************************/
-
-            /**********************************************/
-            //Start listening for TCPIP client connections
-            StartPacketCommunicationsServiceThread();
-            /**********************************************/
-
-            /********************************************************/
-            // Create some timers for maintenence
+          
+            ValidBrowser = BrowserVersion();           
+            CommunicationsDisplay.Navigate("about:blank");  
+            OnCommunications($"Loading... {GeneralFunction.GetDateTimeFormatted}", INK.CLR_BLUE);   
+            CheckOnApplicationDirectory();        
+            StartPacketCommunicationsServiceThread();     
             timerPing = new System.Timers.Timer();
             timerPing.Interval = 240000;// 4 minute ping timer
             timerPing.Enabled = true;
-            timerPing.Elapsed += timerPing_Elapsed;
-
+            timerPing.Elapsed += timerPing_Elapsed;  
             timerGarbagePatrol = new System.Timers.Timer();
             timerGarbagePatrol.Interval = 600000; // 5 minute connection integrity patrol
             timerGarbagePatrol.Enabled = true;
             timerGarbagePatrol.Elapsed += timerGarbagePatrol_Elapsed;
-            /********************************************************/
-
-            // enumerate my IP's
+      
             SetHostNameAndAddress();
         }
         
@@ -261,15 +236,12 @@ namespace TCPIPServer
 
                 byte[] byData = PACKET_FUNCTIONS.StructureToByteArray(xdata);
 
-                //Stopwatch sw = new Stopwatch();
-
-                //sw.Start();
+            
                 lock (svr.workerSockets)
                 {
                     foreach (Server.UserSock s in svr.workerSockets.Values)
                     {
-                        //Console.WriteLine("Ping id - " + s.iClientID.ToString());
-                        //Thread.Sleep(25);//allow a slight moment so all the replies dont happen at the same time
+                     
                         s.PingStatClass.StartTheClock();
 
                         try
@@ -280,14 +252,11 @@ namespace TCPIPServer
                         catch { }
                     }
                 }
-                //sw.Stop();
-                //Debug.WriteLine("TimeAfterSend: " + sw.ElapsedMilliseconds.ToString() + "ms");
+             
             }
             catch { }
         }
-        /**********************************************************************************************************************/
-
-        //private void GarbagePatrol_Tick(object sender, EventArgs e)
+     
         private void timerGarbagePatrol_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             try
@@ -308,14 +277,10 @@ namespace TCPIPServer
                 foreach (Server.UserSock s in svr.workerSockets.Values)
                 {
                     TimeSpan diff = DateTime.Now - s.dTimer;
-                    //Debug.WriteLine("iClientID: " + s.iClientID + " - " + "Time: " + diff.TotalSeconds.ToString());
-
+                   
                     if (diff.TotalSeconds >= 600 || s.UserSocket.Connected == false)//10 minutes
                     {
-                        //Punt the ListVeiw item here but we must make a list of
-                        //clients that we have lost connection with, its not good to remove
-                        //the Servers internal client item while inside its foreach loop;
-                        //listView1.Items.RemoveByKey(s.iClientID.ToString());
+                       
                         ClientIDsToClear.Add(s.iClientID);
                     }
                 }
@@ -323,7 +288,6 @@ namespace TCPIPServer
 
             Debug.WriteLine($"{DateTime.Now.ToLongTimeString()} - Garbage Patrol num of IDs to remove: {ClientIDsToClear.Count}");
 
-            //Ok remove any internal data items we may have
             if (ClientIDsToClear.Count > 0)
             {
                 foreach (int cID in ClientIDsToClear)
@@ -393,8 +357,7 @@ namespace TCPIPServer
             {
                 dClientRawPacketList[clientNumber].AddToList(message, messageSize);
 
-                //Debug.WriteLine("Raw Data From: " + clientNumber.ToString() + ", Size of Packet: " + messageSize.ToString());
-                autoEvent.Set();//Fire in the hole
+
             }
         }
         #endregion
@@ -408,9 +371,9 @@ namespace TCPIPServer
                 OnCommunications($"{GeneralFunction.GetDateTimeFormatted} Incoming Connection {ConnectionID}", INK.CLR_PURPLE);
                 if (svr.workerSockets.ContainsKey(ConnectionID))
                 {
-                    lock (dClientRawPacketList)//http://www.albahari.com/threading/part2.aspx#_Locking
+                    lock (dClientRawPacketList)
                     {
-                        //Add the raw Packet collector
+                       
                         if (!dClientRawPacketList.ContainsKey(ConnectionID))
                         {
                             dClientRawPacketList.Add(ConnectionID, new MotherOfRawPackets(ConnectionID));
@@ -580,12 +543,10 @@ namespace TCPIPServer
 
             while (svr.IsListening)
             {
-                //Debug.WriteLine("Before AutoEvent");
+              
                 autoEvent.WaitOne(10000);//wait at mutex until signal, and drop through every 10 seconds if something strange happens
-                //Debug.WriteLine("After AutoEvent");
-
-                /**********************************************/
-                lock (dClientRawPacketList)//http://www.albahari.com/threading/part2.aspx#_Locking
+               
+                lock (dClientRawPacketList)
                 {
                     foreach (MotherOfRawPackets MRP in dClientRawPacketList.Values)
                     {
@@ -649,9 +610,9 @@ namespace TCPIPServer
 
                                 if (FullPacketList.Count > 0)
                                     autoEvent2.Set();
-                                //Call_ProcessRecievedData_FromThread();
+                             
 
-                            }//end of while(true)
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -661,11 +622,10 @@ namespace TCPIPServer
                             OnCommunications("EXCEPTION in  NormalizeThePackets - " + msg, INK.CLR_RED);
                         }
                     }//end of foreach (dClientRawPacketList)
-                }//end of lock
-                /**********************************************/
+                }
                 if (ServerIsExiting)
                     break;
-            }//Endof of while(svr.IsListening)
+            }
 
             Debug.WriteLine("Exiting the packet normalizer");
             OnCommunications("Exiting the packet normalizer", INK.CLR_RED);
@@ -678,9 +638,9 @@ namespace TCPIPServer
 
             while (svr.IsListening)
             {
-                //Debug.WriteLine("Before AutoEvent");
+                
                 autoEvent2.WaitOne();//wait at mutex until signal
-                //Debug.WriteLine("After AutoEvent");
+                
 
                 try
                 {
@@ -689,9 +649,9 @@ namespace TCPIPServer
                         FullPacket fp;
                         lock (FullPacketList)
                             fp = FullPacketList.Dequeue();
-                        //Console.WriteLine(GetDateTimeFormatted +" - Full packet fromID: " + fp.iFromClient.ToString() + ", Type: " + ((PACKETTYPES)fp.ThePacket[0]).ToString());
+                    
                         UInt16 type = (ushort)(fp.ThePacket[1] << 8 | fp.ThePacket[0]);
-                        switch (type)//Interrigate the first 2 Bytes to see what the packet TYPE is
+                        switch (type)
                         {
                             case (UInt16)PACKETTYPES.TYPE_MyCredentials:
                                 {
@@ -701,8 +661,7 @@ namespace TCPIPServer
                                 break;
                             case (UInt16)PACKETTYPES.TYPE_CredentialsUpdate:
                                 break;
-                            case (UInt16)PACKETTYPES.TYPE_PingResponse:
-                                //Debug.WriteLine(DateTime.Now.ToShortDateString() + ", " + DateTime.Now.ToLongTimeString() + " - Received Ping from: " + fp.iFromClient.ToString() + ", on " + DateTime.Now.ToShortDateString() + ", at: " + DateTime.Now.ToLongTimeString());
+                            case (UInt16)PACKETTYPES.TYPE_PingResponse:                        
                                 UpdateTheConnectionTimers(fp.iFromClient, fp.ThePacket);
                                 break;
                             case (UInt16)PACKETTYPES.TYPE_Close:
@@ -717,7 +676,7 @@ namespace TCPIPServer
                                 PassDataThru(type, fp.iFromClient, fp.ThePacket);
                                 break;
                         }
-                    }//END  while (FullPacketList.Count > 0)
+                    }
                 }//try
                 catch (Exception ex)
                 {
@@ -748,7 +707,7 @@ namespace TCPIPServer
 
             if (!ServerIsExiting)
             {
-                //if we got here then something went wrong, we need to shut down the service
+
                 OnCommunications("SOMETHING CRASHED", INK.CLR_RED);
             }
         }
@@ -759,7 +718,7 @@ namespace TCPIPServer
             {
                 int ForwardTo = (int)message[11] << 24 | (int)message[10] << 16 | (int)message[9] << 8 | (int)message[8];
 
-                //Stuff in who this packet is from so we know who sent it
+
                 byte[] x = BitConverter.GetBytes(MessageFrom);
                 message[12] = (byte)x[0];//idFrom
                 message[13] = (byte)x[1];//idFrom
@@ -799,24 +758,23 @@ namespace TCPIPServer
                                     INK.CLR_BLUE);
                                 OnCommunications($"Client also said:", INK.CLR_BLUE);
 
-                                //sb = new StringBuilder(new string(IncomingData.szStringDataA).TrimEnd('\0'));
+
                                 OnCommunications(new string(IncomingData.szStringDataA).TrimEnd('\0'), INK.CLR_GREEN);
                             }
                         }
                         break;
                     case (UInt16)PACKETTYPES_SUBMESSAGE.SUBMSG_MessageGuts:
                         {
-                                //sb.Append(new string(IncomingData.szStringDataA).TrimEnd('\0'));
+
+
                                 OnCommunications(new string(IncomingData.szStringDataA).TrimEnd('\0'), INK.CLR_GREEN);
                         }
                         break;
                     case (UInt16)PACKETTYPES_SUBMESSAGE.SUBMSG_MessageEnd:
                         {
-                            //sb = new StringBuilder(new string(IncomingData.szStringDataA).TrimEnd('\0'));
+
                             OnCommunications("FINISHED GETTING MESSAGE", INK.CLR_BLUE);
 
-                            /****************************************************************/
-                            //Now tell the client teh message was received!
                             PACKET_DATA xdata = new PACKET_DATA();
                             
                             xdata.Packet_Type = (UInt16)PACKETTYPES.TYPE_MessageReceived;
@@ -845,9 +803,7 @@ namespace TCPIPServer
                     {
                         svr.workerSockets[clientNumber].dTimer = DateTime.Now;
                         Int64 elapsedTime = svr.workerSockets[clientNumber].PingStatClass.StopTheClock();
-                        //Console.WriteLine("UpdateTheConnectionTimers: " + ConnectionID.ToString());
-                        //Debug.WriteLine("Ping Time for " + ConnectionID.ToString() + ": " + elapsedTime.ToString() + "ms");
-
+                     
                         PACKET_DATA IncomingData = new PACKET_DATA();
                         IncomingData = (PACKET_DATA)PACKET_FUNCTIONS.ByteArrayToStructure(message, typeof(PACKET_DATA));
                         
@@ -885,17 +841,11 @@ namespace TCPIPServer
         {
             string strHostName = Dns.GetHostName();
 
-            labelMyIP.Text = $"Host Name: {strHostName}, Listening on Port: {MyPort}";
-            
-            IPAddress[] ips = Dns.GetHostAddresses(strHostName);//.GetValue(0).ToString();
+            labelMyIP.Text = Properties.Settings.Default.ServerIP;
 
-            foreach (IPAddress ip in ips)
-            {
-                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                    listBox1.Items.Add(ip.ToString());
-                else
-                    listBoxUnusedIPs.Items.Add(ip.ToString());
-            }
+
+            IPAddress ips = IPAddress.Parse( Properties.Settings.Default.ServerIP);
+
         }
 
         private void CheckOnApplicationDirectory()
@@ -991,8 +941,7 @@ namespace TCPIPServer
                 xdata.Data6 = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.Major;
                 xdata.Data7 = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.Minor;
                 xdata.Data8 = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.Build;
-                //xdata.Data9 = MySettings.CurrentServiceFeatureVer;
-                
+              
                 byte[] byData = PACKET_FUNCTIONS.StructureToByteArray(xdata);
                 svr.SendMessage(byData);
             }
@@ -1018,51 +967,51 @@ namespace TCPIPServer
         private delegate void OnCommunicationsDelegate(string str, INK iNK);
         private void OnCommunications(string str, INK iNK)
         {
-            if (ValidBrowser == false)
-            {
-                System.Diagnostics.Debug.WriteLine("INVALID BROWSER, must update Internet Explorer to version 8 or better!!");
-                return;
-            }
-            Int32 line = 0;
-            //System.Diagnostics.Debug.WriteLine("~~~~~~ OnCommunications 1:");
-            try
-            {
-                if (InvokeRequired)
-                {
-                    this.Invoke(new OnCommunicationsDelegate(OnCommunications), new object[] { str, iNK });
-                    return;
-                }
+            //if (ValidBrowser == false)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("INVALID BROWSER, must update Internet Explorer to version 8 or better!!");
+            //    return;
+            //}
+            //Int32 line = 0;
+            ////System.Diagnostics.Debug.WriteLine("~~~~~~ OnCommunications 1:");
+            //try
+            //{
+            //    if (InvokeRequired)
+            //    {
+            //        this.Invoke(new OnCommunicationsDelegate(OnCommunications), new object[] { str, iNK });
+            //        return;
+            //    }
 
-                //  System.Diagnostics.Debug.WriteLine("~~~~~~ OnCommunications 2");
-                HtmlDocument doc = CommunicationsDisplay.Document;
-                line = 1;
-                //System.Diagnostics.Debug.WriteLine("~~~~~~ OnCommunications 3");
-                string style = String.Empty;
-                if (iNK.Equals(INK.CLR_GREEN))
-                    style = Properties.Settings.Default.StyleGreen;
-                else if (iNK.Equals(INK.CLR_BLUE))
-                    style = Properties.Settings.Default.StyleBlue;
-                else if (iNK.Equals(INK.CLR_RED))
-                    style = Properties.Settings.Default.StyleRed;
-                else if (iNK.Equals(INK.CLR_PURPLE))
-                    style = Properties.Settings.Default.StylePurple;
-                else
-                    style = Properties.Settings.Default.StyleBlack;
-                line = 2;
-                //System.Diagnostics.Debug.WriteLine("~~~~~~ OnCommunications 4");
-                //doc.Write(String.Format("<div style=\"{0}\">{1}</div><br />", style, str));
-                doc.Write(String.Format("<div style=\"{0}\">{1}</div>", style, str));
-                //doc.Body.ScrollTop = int.MaxValue;
-                //CommunicationsDisplay.Document.Window.ScrollTo(0, int.MaxValue);
-                line = 3;
-                ScrollMessageIntoView();
-                //System.Diagnostics.Debug.WriteLine("~~~~~~ OnCommunications 5");
-                line = 4;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"EXCEPTION IN OnCommunications @ Line: {line}, {ex.Message}");
-            }
+            //    //  System.Diagnostics.Debug.WriteLine("~~~~~~ OnCommunications 2");
+            //    HtmlDocument doc = CommunicationsDisplay.Document;
+            //    line = 1;
+            //    //System.Diagnostics.Debug.WriteLine("~~~~~~ OnCommunications 3");
+            //    string style = String.Empty;
+            //    if (iNK.Equals(INK.CLR_GREEN))
+            //        style = Properties.Settings.Default.StyleGreen;
+            //    else if (iNK.Equals(INK.CLR_BLUE))
+            //        style = Properties.Settings.Default.StyleBlue;
+            //    else if (iNK.Equals(INK.CLR_RED))
+            //        style = Properties.Settings.Default.StyleRed;
+            //    else if (iNK.Equals(INK.CLR_PURPLE))
+            //        style = Properties.Settings.Default.StylePurple;
+            //    else
+            //        style = Properties.Settings.Default.StyleBlack;
+            //    line = 2;
+            //    //System.Diagnostics.Debug.WriteLine("~~~~~~ OnCommunications 4");
+            //    //doc.Write(String.Format("<div style=\"{0}\">{1}</div><br />", style, str));
+            //    doc.Write(String.Format("<div style=\"{0}\">{1}</div>", style, str));
+            //    //doc.Body.ScrollTop = int.MaxValue;
+            //    //CommunicationsDisplay.Document.Window.ScrollTo(0, int.MaxValue);
+            //    line = 3;
+            //    ScrollMessageIntoView();
+            //    //System.Diagnostics.Debug.WriteLine("~~~~~~ OnCommunications 5");
+            //    line = 4;
+            //}
+            //catch (Exception ex)
+            //{
+            //    Debug.WriteLine($"EXCEPTION IN OnCommunications @ Line: {line}, {ex.Message}");
+            //}
         }
 
         /// <summary>
@@ -1098,48 +1047,15 @@ namespace TCPIPServer
         }
         #endregion
 
-        #region UNSAFE CODE
+        
         // The unsafe keyword allows pointers to be used within the following method:
-        static unsafe void Copy(byte[] src, int srcIndex, byte[] dst, int dstIndex, int count)
+        static void Copy(byte[] src, int srcIndex, byte[] dst, int dstIndex, int count)
         {
             try
             {
-                if (src == null || srcIndex < 0 || dst == null || dstIndex < 0 || count < 0)
+                for (int i = 0; i < src.Length; i++)
                 {
-                    Console.WriteLine("Serious Error in the Copy function 1");
-                    throw new System.ArgumentException();
-                }
-
-                int srcLen = src.Length;
-                int dstLen = dst.Length;
-                if (srcLen - srcIndex < count || dstLen - dstIndex < count)
-                {
-                    Console.WriteLine("Serious Error in the Copy function 2");
-                    throw new System.ArgumentException();
-                }
-
-                // The following fixed statement pins the location of the src and dst objects
-                // in memory so that they will not be moved by garbage collection.
-                fixed (byte* pSrc = src, pDst = dst)
-                {
-                    byte* ps = pSrc + srcIndex;
-                    byte* pd = pDst + dstIndex;
-
-                    // Loop over the count in blocks of 4 bytes, copying an integer (4 bytes) at a time:
-                    for (int i = 0; i < count / 4; i++)
-                    {
-                        *((int*)pd) = *((int*)ps);
-                        pd += 4;
-                        ps += 4;
-                    }
-
-                    // Complete the copy by moving any bytes that weren't moved in blocks of 4:
-                    for (int i = 0; i < count % 4; i++)
-                    {
-                        *pd = *ps;
-                        pd++;
-                        ps++;
-                    }
+                    dst[i] = src[i];
                 }
             }
             catch (Exception ex)
@@ -1149,7 +1065,7 @@ namespace TCPIPServer
             }
 
         }
-        #endregion
+        
         
     }
 }

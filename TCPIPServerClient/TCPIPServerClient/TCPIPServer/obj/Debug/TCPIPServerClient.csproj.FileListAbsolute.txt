@@ -1,1 +1,0 @@
-D:\MyDocuments\Visual Studio 2015\Projects\TCPIPServerClient\TCPIPServerClient\bin\Debug\TCPIPServerClient.exe.config

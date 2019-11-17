@@ -12,109 +12,63 @@ namespace TCPIPServer.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
-    {
-
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.3.0.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-
-        public static Settings Default
-        {
-            get
-            {
+        
+        public static Settings Default {
+            get {
                 return defaultInstance;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("font-family:Lucida Console;font-size:10px;color:Green;")]
-        public string StyleGreen
-        {
-            get
-            {
-                return ((string)(this["StyleGreen"]));
+        [global::System.Configuration.DefaultSettingValueAttribute("9999")]
+        public string Port {
+            get {
+                return ((string)(this["Port"]));
             }
-            set
-            {
-                this["StyleGreen"] = value;
+            set {
+                this["Port"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("font-family:Lucida Console;font-size:10px;color:Red;")]
-        public string StyleRed
-        {
-            get
-            {
-                return ((string)(this["StyleRed"]));
+        [global::System.Configuration.DefaultSettingValueAttribute("Anonymous")]
+        public string ServerUserName {
+            get {
+                return ((string)(this["ServerUserName"]));
             }
-            set
-            {
-                this["StyleRed"] = value;
+            set {
+                this["ServerUserName"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("font-family:Lucida Console;font-size:10px;color:Blue;")]
-        public string StyleBlue
-        {
-            get
-            {
-                return ((string)(this["StyleBlue"]));
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
+        public string ServerIP {
+            get {
+                return ((string)(this["ServerIP"]));
             }
-            set
-            {
-                this["StyleBlue"] = value;
+            set {
+                this["ServerIP"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("font-family:Lucida Console;font-size:10px;color:Black;")]
-        public string StyleBlack
-        {
-            get
-            {
-                return ((string)(this["StyleBlack"]));
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string ServerHost {
+            get {
+                return ((string)(this["ServerHost"]));
             }
-            set
-            {
-                this["StyleBlack"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("font-family:Lucida Console;font-size:10px;color:Purple;")]
-        public string StylePurple
-        {
-            get
-            {
-                return ((string)(this["StylePurple"]));
-            }
-            set
-            {
-                this["StylePurple"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("font-family:Lucida Console;font-size:10px;color:Orange;")]
-        public string StyleOrange
-        {
-            get
-            {
-                return ((string)(this["StyleOrange"]));
-            }
-            set
-            {
-                this["StyleOrange"] = value;
+            set {
+                this["ServerHost"] = value;
             }
         }
     }
-
 }
