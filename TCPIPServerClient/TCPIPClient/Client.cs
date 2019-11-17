@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net.Sockets;
-using System.Threading;
+using System.Diagnostics;
 using System.Net;
-using System.Security.Permissions;
+using System.Net.Sockets;
+using System.Windows.Forms;
 
 namespace TCPClient
 {
@@ -202,9 +200,10 @@ namespace TCPClient
         /// <summary>
         /// Send a message to the server we are connected to.
         /// </summary>
-        /// <param name="message">A byte array representing the message to send.</param>
+        /// <param name="message">A byte array representing the message to )send.</param>
         public void SendMessage(byte[] message)
         {
+            
             if (_clientSocket != null)
                 if (_clientSocket.Connected)
                     _clientSocket.Send(message);
@@ -339,7 +338,7 @@ namespace TCPClient
         private void ToFile(string message)
         {
             string AppPath = CommonClassLibs.GeneralFunction.GetAppPath;
-            
+
             System.IO.StreamWriter sw = null;
             try
             {
@@ -361,7 +360,7 @@ namespace TCPClient
                         sw.Dispose();
                     }
                 }
-                catch 
+                catch
                 {
                     //Console.WriteLine("\n\nISSUE HERE TOO:\n" + ex2.Message + "\n\n");
                 }

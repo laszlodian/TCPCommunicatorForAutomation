@@ -8,8 +8,13 @@ C:\Users\ecklerpa\Documents\Visual Studio 2015\Projects\TCPIPServerClient\Common
 C:\Users\ecklerpa\Documents\Visual Studio 2015\Projects\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.csprojResolveAssemblyReference.cache
 C:\Users\ecklerpa\Documents\Visual Studio 2015\Projects\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.dll
 C:\Users\ecklerpa\Documents\Visual Studio 2015\Projects\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.pdb
-D:\SOURCES\TCPIPServerClient\TCPIPServerClient\CommonClassLibs\bin\Debug\CommonClassLibs.dll
-D:\SOURCES\TCPIPServerClient\TCPIPServerClient\CommonClassLibs\bin\Debug\CommonClassLibs.pdb
-D:\SOURCES\TCPIPServerClient\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.csprojAssemblyReference.cache
-D:\SOURCES\TCPIPServerClient\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.dll
-D:\SOURCES\TCPIPServerClient\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.pdb
+D:\TCPIPServerClient\CommonClassLibs\bin\Debug\CommonClassLibs.dll
+D:\TCPIPServerClient\CommonClassLibs\bin\Debug\CommonClassLibs.pdb
+D:\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.csprojAssemblyReference.cache
+D:\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.dll
+D:\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.pdb
+e:\TCPIPServerClient\CommonClassLibs\bin\Debug\CommonClassLibs.dll
+e:\TCPIPServerClient\CommonClassLibs\bin\Debug\CommonClassLibs.pdb
+e:\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.csprojAssemblyReference.cache
+e:\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.dll
+e:\TCPIPServerClient\CommonClassLibs\obj\Debug\CommonClassLibs.pdb

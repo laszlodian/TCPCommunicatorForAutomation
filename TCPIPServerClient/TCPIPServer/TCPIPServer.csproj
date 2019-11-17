@@ -31,13 +31,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>TCPIPServer.Program</StartupObject>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>MainIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommonClassLibs">
@@ -56,22 +49,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="frmServer.cs">
+    <Compile Include="ServerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmServer.Designer.cs">
-      <DependentUpon>frmServer.cs</DependentUpon>
+    <Compile Include="ServerForm.Designer.cs">
+      <DependentUpon>ServerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="Resources\Resources.resx" />
-    <None Include="Resources\Resources.Designer.cs" />
     <Compile Include="Server.cs" />
-    <EmbeddedResource Include="frmServer.resx">
-      <DependentUpon>frmServer.cs</DependentUpon>
+    <EmbeddedResource Include="ServerForm.resx">
+      <DependentUpon>ServerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
+      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -94,8 +85,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="MainIcon.ico" />
-    <Content Include="OK.ico" />
+    <ProjectReference Include="..\TCPIPClient\TCPIPClient.csproj">
+      <Project>{46830595-d4f0-4f6d-9b96-96ecca271dbb}</Project>
+      <Name>TCPIPClient</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

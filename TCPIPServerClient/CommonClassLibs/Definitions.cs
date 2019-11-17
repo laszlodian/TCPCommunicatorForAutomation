@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Xml.Serialization;
 
 
 [Flags]
@@ -211,7 +208,7 @@ public static class PACKET_FUNCTIONS
         return rawdatas;
     }
 
-    public static Object ByteArrayToStructure(Byte [] rawdatas, Type anytype)
+    public static Object ByteArrayToStructure(Byte[] rawdatas, Type anytype)
     {
         Int32 rawsize = Marshal.SizeOf(anytype);
         if (rawsize > rawdatas.Length)

@@ -1,58 +1,68 @@
-﻿using CommonClassLibs;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using CommonClassLibs;
 using TCPClient;
 
 namespace TCPIPClient
 {
     public partial class ClientForm : Form
     {
-        #region Variables
-        private Client client = null;//Client Socket class    
+        /*******************************************************/
+        private Client client = null;//Client Socket class
+
         private MotherOfRawPackets HostServerRawPackets = null;
         static AutoResetEvent autoEventHostServer = null;//mutex
         static AutoResetEvent autoEvent2;//mutex
         private Thread DataProcessHostServerThread = null;
         private Thread FullPacketDataProcessThread = null;
         private Queue<FullPacket> FullHostServerPacketList = null;
-        private bool AppIsExiting = false;
-        private bool ServerConnected = false;
-        private int MyHostServerID = 0;
-        private long ServerTime = DateTime.Now.Ticks;
-        private System.Windows.Forms.Timer GeneralTimer = null;
-        //App and DLL Version
-       public string VersionNumber = string.Empty;
-        #endregion
+        /*******************************************************/
+
+        bool AppIsExiting = false;
+        bool ServerConnected = false;
+        int MyHostServerID = 0;
+        long ServerTime = DateTime.Now.Ticks;
+
+        System.Windows.Forms.Timer GeneralTimer = null;
+
+
+        private string stuffSent;
+
+        public string StuffSent
+        {
+            get { return stuffSent; }
+            set { stuffSent = value; }
+        }
 
         public ClientForm()
         {
             InitializeComponent();
+            Instance = this;
         }
 
         private void frmClient_Load(object sender, EventArgs e)
-        {            
-            CheckOnApplicationDirectory();                     
+        {
+            /**********************************************/
+            //Create a directory we can write stuff too
+            CheckOnApplicationDirectory();
+            /**********************************************/
+
             pictureBox1.Image = imageListStatusLights.Images["RED"];
 
-            VersionNumber = Assembly.GetEntryAssembly().GetName().Version.Major.ToString() + "." +
-                        Assembly.GetEntryAssembly().GetName().Version.Minor.ToString() + "." +
-                        Assembly.GetEntryAssembly().GetName().Version.Build.ToString();
-            textBoxText.Text += Environment.NewLine + "$> ";
 
+            textBoxText.Text = "$> ";
+            labelStatusInfo.ForeColor = System.Drawing.Color.Red;
+            Properties.Settings.Default.ClientName = Environment.UserDomainName;
 
+            this.Text += string.Format("{0} | {1} | {2}", this.Text, Environment.UserDomainName, Properties.Settings.Default.Port,
+                Properties.Settings.Default.ClientIP);
         }
 
         private void frmClient_FormClosing(object sender, FormClosingEventArgs e)
@@ -92,7 +102,7 @@ namespace TCPIPClient
             buttonSendDataToServer.Enabled = false;
             ServerConnected = false;
             labelStatusInfo.Text = "Disconnected";
-    
+            labelStatusInfo.ForeColor = System.Drawing.Color.Red;
             pictureBox1.Image = imageListStatusLights.Images["RED"];
             buttonConnectToServer.Enabled = true;
             SetSomeLabelInfoFromThread("...");
@@ -100,48 +110,52 @@ namespace TCPIPClient
 
         private void buttonSendDataToServer_Click(object sender, EventArgs e)
         {
-            string tbText = textBoxText.Text.Substring(textBoxText.Text.LastIndexOf('>'));
+          StuffSent= textBoxText.Text.Split('#')[0];    
+
             pictureBox1.Image = imageListStatusLights.Images["BLUE"];
-            PACKET_DATA xdata = new PACKET_DATA();   
-          
+            PACKET_DATA xdata = new PACKET_DATA();
+
+            /****************************************************************/
+            //prepair the start packet
             xdata.Packet_Type = (UInt16)PACKETTYPES.TYPE_Message;
             xdata.Data_Type = (UInt16)PACKETTYPES_SUBMESSAGE.SUBMSG_MessageStart;
             xdata.Packet_Size = 16;
             xdata.maskTo = 0;
             xdata.idTo = 0;
-            xdata.idFrom = 0;      
-      
+            xdata.idFrom = 0;
+
+            //Before we send the text, lets stuff those Number values in the first data packet!
             Int32 num1 = 0;
-            Int32.TryParse(Convert.ToString(98765), out num1);
+            Int32.TryParse("98765", out num1);
             xdata.Data16 = num1;
             Int32 num2 = 0;
-            Int32.TryParse(Convert.ToString(12345), out num2);
+            Int32.TryParse("12345", out num2);
             xdata.Data17 = num2;
 
             int pos = 0;
             int chunkSize = xdata.szStringDataA.Length;//300 bytes
 
-            if (tbText.Length <= xdata.szStringDataA.Length)
+            if (StuffSent.Length <= xdata.szStringDataA.Length)
             {
-                tbText.CopyTo(0, xdata.szStringDataA, 0, tbText.Length);
-                chunkSize = tbText.Length;
+                StuffSent.CopyTo(0, xdata.szStringDataA, 0, StuffSent.Length);
+                chunkSize = StuffSent.Length;
             }
             else
-             tbText.CopyTo(0, xdata.szStringDataA, 0, xdata.szStringDataA.Length);
+                StuffSent.CopyTo(0, xdata.szStringDataA, 0, xdata.szStringDataA.Length);
 
             xdata.Data1 = (UInt32)chunkSize;
 
             byte[] byData = PACKET_FUNCTIONS.StructureToByteArray(xdata);
 
-            SendMessageToServer(byData);         
-            
+            SendMessageToServer(byData);
+
+            /**************************************************/
+            //Send the message body(if there is any)
             xdata.Data_Type = (UInt16)PACKETTYPES_SUBMESSAGE.SUBMSG_MessageGuts;
             pos = chunkSize;//set position
             while (true)
             {
-                string message = tbText.Split(' ')[1].Trim();
-                tbText += Environment.NewLine + "$> ";
-                int PosFromEnd = tbText.Length - pos;
+                int PosFromEnd = StuffSent.Length - pos;
 
                 if (PosFromEnd <= 0)
                     break;
@@ -149,11 +163,11 @@ namespace TCPIPClient
                 Array.Clear(xdata.szStringDataA, 0, xdata.szStringDataA.Length);//Clear this field before putting more data in it
 
                 if (PosFromEnd < xdata.szStringDataA.Length)
-                    chunkSize = tbText.Length - pos;
+                    chunkSize = StuffSent.Length - pos;
                 else
                     chunkSize = xdata.szStringDataA.Length;
 
-                message.CopyTo(pos, xdata.szStringDataA, 0, chunkSize);
+                StuffSent.CopyTo(pos, xdata.szStringDataA, 0, chunkSize);
                 xdata.Data1 = (UInt32)chunkSize;
                 pos += chunkSize;//set new position
 
@@ -161,7 +175,8 @@ namespace TCPIPClient
                 SendMessageToServer(byData);
             }
 
-          
+            /**************************************************/
+            //Send an EndMessage
             xdata.Data_Type = (UInt16)PACKETTYPES_SUBMESSAGE.SUBMSG_MessageEnd;
             xdata.Data1 = (UInt32)pos;//send the total which should be the 'pos' value
             byData = PACKET_FUNCTIONS.StructureToByteArray(xdata);
@@ -195,7 +210,7 @@ namespace TCPIPClient
 
                 int port = 0;
                 if (!Int32.TryParse(textBoxServerListeningPort.Text, out port))
-                    port = Int32.Parse(Properties.Settings.Default.Port);
+                    port = 9999;
 
                 IPAddress ipAdd = IPAddress.Parse(szIPstr);
                 client.Connect(ipAdd, port);//(int)GeneralSettings.HostPort);
@@ -214,6 +229,8 @@ namespace TCPIPClient
         }
 
         bool ImDisconnecting = false;
+        public static ClientForm Instance;
+
         public void DoServerDisconnect()
         {
             int Line = 0;
@@ -251,9 +268,11 @@ namespace TCPIPClient
 
                 Line = 5;
 
+
+                /***************************************************/
                 try
                 {
-                    
+                    //bust out of the data loops
                     if (autoEventHostServer != null)
                     {
                         autoEventHostServer.Set();
@@ -264,7 +283,8 @@ namespace TCPIPClient
                             Thread.Sleep(1);
                             if (i++ > 200)
                             {
-                                DataProcessHostServerThread.Abort();                                
+                                DataProcessHostServerThread.Abort();
+                                //Debug.WriteLine("\nHAD TO ABORT PACKET THREAD\n");
                                 break;
                             }
                         }
@@ -287,9 +307,11 @@ namespace TCPIPClient
                     autoEvent2.Close();
                     autoEvent2.Dispose();
                     autoEvent2 = null;
-                }                    
+                }
+                /***************************************************/
 
-                Line = 9;                
+                Line = 9;
+                //Debug.WriteLine("AppIsExiting = " + AppIsExiting.ToString());
                 if (client != null)
                 {
                     if (client.OnReceiveData != null)
@@ -305,7 +327,8 @@ namespace TCPIPClient
 
                 try
                 {
-                    Line = 13;                
+                    Line = 13;
+                    //buttonConnect.Text = "Connect";
                     labelStatusInfo.Text = "NOT Connected";
                     Line = 14;
                     labelStatusInfo.ForeColor = System.Drawing.Color.Red;
@@ -332,7 +355,7 @@ namespace TCPIPClient
         {
             try
             {
-              
+                /**** Packet processor mutex, loop and other support variables *************************/
                 autoEventHostServer = new AutoResetEvent(false);//the data mutex
                 autoEvent2 = new AutoResetEvent(false);//the FullPacket data mutex
                 FullPacketDataProcessThread = new Thread(new ThreadStart(ProcessRecievedServerData));
@@ -352,7 +375,9 @@ namespace TCPIPClient
                 {
                     lock (FullHostServerPacketList)
                         FullHostServerPacketList.Clear();
-                }  
+                }
+                /***************************************************************************************/
+
 
                 FullPacketDataProcessThread.Start();
                 DataProcessHostServerThread.Start();
@@ -374,8 +399,8 @@ namespace TCPIPClient
         private void OnDataReceive(byte[] message, int messageSize)
         {
             if (AppIsExiting)
-                return;            
-
+                return;
+            //Console.WriteLine($"Raw Data From: Host Server, Size of Packet: {messageSize}");
             HostServerRawPackets.AddToList(message, messageSize);
             if (autoEventHostServer != null)
                 autoEventHostServer.Set();//Fire in the hole
@@ -385,13 +410,16 @@ namespace TCPIPClient
         /// Server disconnected
         /// </summary>
         private void OnDisconnect()
-        {                     
+        {
+            //Debug.WriteLine("Something Disconnected!! - OnDisconnect()");
             DoServerDisconnect();
         }
         #endregion
 
         internal void SendMessageToServer(byte[] byData)
-        {         
+        {
+            //TimeSpan ts = client.LastDataFromServer
+
             if (client.Connected)
                 client.SendMessage(byData);
         }
@@ -404,15 +432,21 @@ namespace TCPIPClient
                 Console.WriteLine($"NormalizeServerRawPackets ThreadID = {Thread.CurrentThread.ManagedThreadId}");
 
                 while (ServerConnected)
-                { 
-                    autoEventHostServer.WaitOne(10000);//wait at mutex until signal                    
+                {
+                    //ods.DebugOut("Before AutoEvent");
+                    autoEventHostServer.WaitOne(10000);//wait at mutex until signal
+                    //autoEventHostServer.WaitOne();//wait at mutex until signal
+                    //ods.DebugOut("After AutoEvent");
 
                     if (AppIsExiting || this.IsDisposed)
-                        break;                                                                              
+                        break;
+
+                    /**********************************************/
 
                     if (HostServerRawPackets.GetItemCount == 0)
-                        continue;                 
-                 
+                        continue;
+
+                    //byte[] packetplayground = new byte[45056];//good for 10 full packets(40960) + 1 remainder(4096)
                     byte[] packetplayground = new byte[11264];//good for 10 full packets(10240) + 1 remainder(1024)
                     RawPackets rp;
 
@@ -461,8 +495,9 @@ namespace TCPIPClient
                         else
                         {
                             HostServerRawPackets.bytesRemaining = holdLen;
-                        }  
-                      
+                        }
+
+                        //hang onto the remainder
                         Copy(packetplayground, actualPackets * 1024, HostServerRawPackets.Remainder, 0, HostServerRawPackets.bytesRemaining);
                         #endregion
 
@@ -470,7 +505,8 @@ namespace TCPIPClient
                         if (FullHostServerPacketList.Count > 0)
                             autoEvent2.Set();
 
-                    }
+                    }//end of while(true)
+                    /**********************************************/
                 }
 
                 Console.WriteLine("Exiting the packet normalizer");
@@ -489,8 +525,10 @@ namespace TCPIPClient
                 Console.WriteLine($"ProcessRecievedHostServerData ThreadID = {Thread.CurrentThread.ManagedThreadId}");
                 while (ServerConnected)
                 {
-                   autoEvent2.WaitOne(10000);//wait at mutex until signal
-                  
+                    //ods.DebugOut("Before AutoEvent2");
+                    autoEvent2.WaitOne(10000);//wait at mutex until signal
+                    //autoEvent2.WaitOne();
+                    //ods.DebugOut("After AutoEvent2");
                     if (AppIsExiting || !ServerConnected || this.IsDisposed)
                         break;
 
@@ -503,12 +541,13 @@ namespace TCPIPClient
                                 fp = FullHostServerPacketList.Dequeue();
 
                             UInt16 type = (ushort)(fp.ThePacket[1] << 8 | fp.ThePacket[0]);
-                          
+                            //Debug.WriteLine("Got Server data... Packet type: " + ((PACKETTYPES)type).ToString());
                             switch (type)//Interrogate the first 2 Bytes to see what the packet TYPE is
                             {
                                 case (Byte)PACKETTYPES.TYPE_RequestCredentials:
                                     {
-                                        ReplyToHostCredentialRequest(fp.ThePacket);                                        
+                                        ReplyToHostCredentialRequest(fp.ThePacket);
+                                        //(new Thread(() => ReplyToHostCredentialRequest(fp.ThePacket))).Start();//
                                     }
                                     break;
                                 case (Byte)PACKETTYPES.TYPE_Ping:
@@ -539,7 +578,9 @@ namespace TCPIPClient
                             Console.WriteLine($"EXCEPTION IN: ProcessRecievedServerData A - {exceptionMessage}");
                         }
                     }//end while
-                }//end 
+                }//end while serverconnected
+
+                //ods.DebugOut("Exiting the ProcessRecievedHostServerData() thread");
             }
             catch (Exception ex)
             {
@@ -577,10 +618,13 @@ namespace TCPIPClient
             {
                 PACKET_DATA IncomingData = new PACKET_DATA();
                 IncomingData = (PACKET_DATA)PACKET_FUNCTIONS.ByteArrayToStructure(message, typeof(PACKET_DATA));
-                                  
+
+                /****************************************************************************************/
+                //calculate how long that ping took to get here
                 TimeSpan ts = (new DateTime(IncomingData.DataLong1)) - (new DateTime(ServerTime));
                 Console.WriteLine($"{GeneralFunction.GetDateTimeFormatted}: {string.Format("Ping From Server to client: {0:0.##}ms", ts.TotalMilliseconds)}");
-                
+                /****************************************************************************************/
+
                 ServerTime = IncomingData.DataLong1;// Server computer's current time!
 
                 PACKET_DATA xdata = new PACKET_DATA();
@@ -632,12 +676,17 @@ namespace TCPIPClient
             Console.WriteLine($"ReplyToHostCredentialRequest ThreadID = {Thread.CurrentThread.ManagedThreadId}");
             Int32 Loc = 0;
             try
-            {                      
+            {
+                //We will assume to tell the host this is just an update of the
+                //credentials we first sent during the application start. This
+                //will be true if the 'message' argument is null, otherwise we
+                //will change the packet type below to the 'TYPE_MyCredentials'.
                 UInt16 PaketType = (UInt16)PACKETTYPES.TYPE_CredentialsUpdate;
 
                 if (message != null)
                 {
                     int myOldServerID = 0;
+                    //The host server has past my ID.
                     PACKET_DATA IncomingData = new PACKET_DATA();
                     IncomingData = (PACKET_DATA)PACKET_FUNCTIONS.ByteArrayToStructure(message, typeof(PACKET_DATA));
                     Loc = 10;
@@ -656,7 +705,8 @@ namespace TCPIPClient
 
                     PaketType = (UInt16)PACKETTYPES.TYPE_MyCredentials;
                 }
-               
+
+                //ods.DebugOut("Send Host Server some info about myself");
                 PACKET_DATA xdata = new PACKET_DATA();
 
                 xdata.Packet_Type = PaketType;
@@ -674,7 +724,8 @@ namespace TCPIPClient
                     p.CopyTo(0, xdata.szStringDataA, 0, p.Length);
                 xdata.szStringDataA[(xdata.szStringDataA.Length - 1)] = '\0';//cap it off just incase
 
-                
+                //App and DLL Version
+                string VersionNumber = string.Empty;
 
                 VersionNumber = Assembly.GetEntryAssembly().GetName().Version.Major.ToString() + "." +
                                     Assembly.GetEntryAssembly().GetName().Version.Minor.ToString() + "." +
@@ -696,6 +747,7 @@ namespace TCPIPClient
 
                 //Application type
                 xdata.nAppLevel = (UInt16)APPLEVEL.None;
+
 
                 byte[] byData = PACKET_FUNCTIONS.StructureToByteArray(xdata);
                 Loc = 60;
@@ -802,16 +854,19 @@ namespace TCPIPClient
         {
             if (client != null)
             {
-                TimeSpan ts = DateTime.Now - client.LastDataFromServer;             
-           
+                TimeSpan ts = DateTime.Now - client.LastDataFromServer;
+
+                //If we dont hear from the server for more than 5 minutes then there is a problem so disconnect
                 if (ts.TotalMinutes > 5)
                 {
                     DestroyGeneralTimer();
                     HostCommunicationsHasQuit(false);
                 }
             }
+
+            // Add 5 seconds worth of Ticks to the server time
             ServerTime += (TimeSpan.TicksPerSecond * 5);
-            
+            //Console.WriteLine("SERVER TIME: " + (new DateTime(GeneralFunction.ServerTime)).ToLocalTime().TimeOfDay.ToString());
         }
 
         private void DestroyGeneralTimer()
@@ -844,11 +899,15 @@ namespace TCPIPClient
 
             try
             {
-                string[] qaudNums = SHubServer.Split('.'); 
-                
+                string[] qaudNums = SHubServer.Split('.');
+
+                // See if its not a straightup IP address.. 
+                //if not then we have to resolve the computer name
                 if (qaudNums.Length != 4)
-                {                   
+                {
+                    //Must be a name so see if we can resolve it
                     IPHostEntry hostEntry = Dns.GetHostEntry(SHubServer);
+
                     foreach (IPAddress a in hostEntry.AddressList)
                     {
                         if (a.AddressFamily == AddressFamily.InterNetwork)//use IP 4 for now
@@ -856,12 +915,14 @@ namespace TCPIPClient
                             SHubServer = a.ToString();
                             break;
                         }
-                    }                 
+                    }
+                    //SHubServer = hostEntry.AddressList[0].ToString();
                 }
             }
             catch (SocketException se)
             {
-                Console.WriteLine($"Exception: {se.Message}");                
+                Console.WriteLine($"Exception: {se.Message}");
+                //statusStrip1.Items[1].Text = se.Message + " for " + Properties.Settings.Default.HostIP;
                 SHubServer = string.Empty;
             }
 
@@ -885,15 +946,48 @@ namespace TCPIPClient
             }
         }
 
-      
+        #region UNSAFE CODE
         // The unsafe keyword allows pointers to be used within the following method:
-        static void Copy(byte[] src, int srcIndex, byte[] dst, int dstIndex, int count)
+        static unsafe void Copy(byte[] src, int srcIndex, byte[] dst, int dstIndex, int count)
         {
             try
             {
-                for (int i = 0; i < src.Length; i++)
+                if (src == null || srcIndex < 0 || dst == null || dstIndex < 0 || count < 0)
                 {
-                    dst[i] = src[i];
+                    Console.WriteLine("Serious Error in the Copy function 1");
+                    throw new System.ArgumentException();
+                }
+
+                int srcLen = src.Length;
+                int dstLen = dst.Length;
+                if (srcLen - srcIndex < count || dstLen - dstIndex < count)
+                {
+                    Console.WriteLine("Serious Error in the Copy function 2");
+                    throw new System.ArgumentException();
+                }
+
+                // The following fixed statement pins the location of the src and dst objects
+                // in memory so that they will not be moved by garbage collection.
+                fixed (byte* pSrc = src, pDst = dst)
+                {
+                    byte* ps = pSrc + srcIndex;
+                    byte* pd = pDst + dstIndex;
+
+                    // Loop over the count in blocks of 4 bytes, copying an integer (4 bytes) at a time:
+                    for (int i = 0; i < count / 4; i++)
+                    {
+                        *((int*)pd) = *((int*)ps);
+                        pd += 4;
+                        ps += 4;
+                    }
+
+                    // Complete the copy by moving any bytes that weren't moved in blocks of 4:
+                    for (int i = 0; i < count % 4; i++)
+                    {
+                        *pd = *ps;
+                        pd++;
+                        ps++;
+                    }
                 }
             }
             catch (Exception ex)
@@ -901,7 +995,9 @@ namespace TCPIPClient
                 var exceptionMessage = (ex.InnerException != null) ? ex.InnerException.Message : ex.Message;
                 Console.WriteLine("EXCEPTION IN: Copy - " + exceptionMessage);
             }
-       }         
 
+        }
+
+        #endregion
     }
 }

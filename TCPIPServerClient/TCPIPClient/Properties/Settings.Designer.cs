@@ -37,6 +37,30 @@ namespace TCPIPClient.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Anonymous")]
+        public string ClientName {
+            get {
+                return ((string)(this["ClientName"]));
+            }
+            set {
+                this["ClientName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string ClientHost {
+            get {
+                return ((string)(this["ClientHost"]));
+            }
+            set {
+                this["ClientHost"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
         public string ClientIP {
             get {
@@ -49,25 +73,13 @@ namespace TCPIPClient.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
-        public string ClientHostName {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Command {
             get {
-                return ((string)(this["ClientHostName"]));
+                return ((string)(this["Command"]));
             }
             set {
-                this["ClientHostName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Anonymous")]
-        public string ClientUserName {
-            get {
-                return ((string)(this["ClientUserName"]));
-            }
-            set {
-                this["ClientUserName"] = value;
+                this["Command"] = value;
             }
         }
     }

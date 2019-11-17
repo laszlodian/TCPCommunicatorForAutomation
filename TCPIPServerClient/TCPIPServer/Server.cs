@@ -1,30 +1,22 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net.Sockets;
-using System.Threading;
+using System.Diagnostics;
 using System.Net;
-using static TCPServer.Server;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
+using TCPIPClient;
+using TCPIPServer;
 
 namespace TCPServer
 {
-
-   
     /// <summary>
     /// A class that listens on a port for client connections, sends and recieves messages from connected clients,
     /// and periodically broadcasts UDP messages.
     /// </summary>
     public class Server
     {
-        #region Variables
-        private ClientConnectCallback _clientConnect = null;
-        private ClientDisconnectCallback _clientDisconnect = null;
-        private ReceiveDataCallback _receive = null;
-        private Socket _mainSocket;
-        private Timer _broadcastTimer;
-        private int _currentClientNumber = 0;
-        public Dictionary<int, UserSock> workerSockets = new Dictionary<int, UserSock>();
-        #endregion
         /// <summary>
         /// A delegate type called when a client initially connects to the server.  Void return type.
         /// </summary>
@@ -45,7 +37,13 @@ namespace TCPServer
         /// <param name="messageSize">The size in bytes of the message.</param>
         public delegate void ReceiveDataCallback(int clientNumber, byte[] message, int messageSize);
 
+        private ClientConnectCallback _clientConnect = null;
+        private ClientDisconnectCallback _clientDisconnect = null;
+        private ReceiveDataCallback _receive = null;
 
+        private Socket _mainSocket;
+        private System.Threading.Timer _broadcastTimer;
+        private int _currentClientNumber = 0;
 
         public class UserSock
         {
@@ -83,7 +81,10 @@ namespace TCPServer
             private PingStatsClass _pingStatClass;
         }
 
-        #region Properties
+        // public Dictionary<int, Socket > workerSockets = new Dictionary<int, Socket>();
+        public Dictionary<int, UserSock> workerSockets = new Dictionary<int, UserSock>();
+
+
         /// <summary>
         /// Modify the callback function used when a client initially connects to the server.
         /// </summary>
@@ -146,7 +147,6 @@ namespace TCPServer
             }
         }
 
-        #endregion
         /// <summary>
         /// Make the server listen for client connections on a specific port.
         /// </summary>
@@ -155,7 +155,7 @@ namespace TCPServer
         {
             try
             {
-           //     Stop();
+                Stop();
 
                 _mainSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 _mainSocket.Bind(new IPEndPoint(IPAddress.Any, listenPort));
@@ -191,28 +191,28 @@ namespace TCPServer
         /// <summary>
         /// Send a message to all connected clients.
         /// </summary>
-        /// <param name = "message" > A byte array representing the message to send.</param>
-        public void SendMessage(byte[] message)
-        {
-            try
-            {
-                foreach (UserSock s in workerSockets.Values)
-                {
-                    if (s.UserSocket.Connected)
-                    {
-                        try
-                        {
-                            s.UserSocket.Send(message);
-                        }
-                        catch { }
-                    }
-                }
-            }
-            catch (SocketException se)
-            {
-                System.Console.WriteLine(se.Message);
-            }
-        }
+        /// <param name="message">A byte array representing the message to send.</param>
+        //public void SendMessage(byte[] message)
+        //{
+        //    try
+        //    {
+        //        foreach (UserSock s in workerSockets.Values)
+        //        {
+        //            if (s.UserSocket.Connected)
+        //            {
+        //                try
+        //                {
+        //                    s.UserSocket.Send(message);
+        //                }
+        //                catch { }
+        //            }
+        //        }
+        //    }
+        //    catch (SocketException se)
+        //    {
+        //        System.Console.WriteLine(se.Message);
+        //    }
+        //}
 
         public void SendMessage(byte[] message, bool testConnections = false)
         {
@@ -272,6 +272,7 @@ namespace TCPServer
             }
         }
 
+        string cmd = string.Empty;
         /// <summary>
         /// Send a message to a specific client.
         /// </summary>
@@ -281,18 +282,59 @@ namespace TCPServer
         {
             if (!workerSockets.ContainsKey(clientNumber))
             {
-    
+                //throw new ArgumentException("Invalid Client Number", "clientNumber");
                 System.Console.WriteLine("Invalid Client Number");
                 return;
             }
             try
             {
-               
+       
+                DecodeArrivedCommmand(ServerForm.PacketAsString);
+
                 ((UserSock)workerSockets[clientNumber]).UserSocket.Send(message);
             }
             catch (SocketException se)
             {
                 System.Console.WriteLine(se.Message);
+            }
+        }
+
+        private string DecodeMessage(byte[] message)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < message.Length; i++)
+            {
+                sb.Append(Convert.ToChar( message[i]));
+            }
+
+            return sb.ToString();
+        }
+
+        private void DecodeArrivedCommmand(string cmd)
+        {
+            switch (cmd)
+            {
+
+                case "test":
+                    MessageBox.Show("test was the command");
+                    break;
+                case "station":
+                    MessageBox.Show("Station command arrived!");
+                    Process station = new Process();
+                    station.StartInfo = new ProcessStartInfo("msconfig.exe");
+                    station.Start();
+                    break;
+
+                case "robot":
+                    MessageBox.Show("Robot command arrived!");
+                    Process robot = new Process();
+                    robot.StartInfo = new ProcessStartInfo("cmd.exe");
+                    robot.Start();
+                    robot.Start();
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -426,14 +468,19 @@ namespace TCPServer
         private void OnDataReceived(IAsyncResult asyn)
         {
             Packet socketData = (Packet)asyn.AsyncState;
-
+            
+              
+           
+           
+                                     
             try
             {
                 int dataSize = socketData.CurrentSocket.EndReceive(asyn);
 
                 if (dataSize.Equals(0))
                 {
-                  
+                    //System.Diagnostics.Debug.WriteLine($"OnDataReceived datasize is 0, zerocount = {((UserSock)workerSockets[socketData.ClientNumber]).ZeroDataCount}");//pe 5-3-2017
+
                     if (workerSockets.ContainsKey(socketData.ClientNumber))
                     {
                         if (((UserSock)workerSockets[socketData.ClientNumber]).ZeroDataCount++ == 10)
@@ -445,27 +492,10 @@ namespace TCPServer
                 }
                 else
                 {
+                    //if (_receive != null)
+               
+                    _receive(socketData.ClientNumber, socketData.DataBuffer, dataSize);
 
-                    if (_receive != null)
-                    {
-                        string message = string.Empty;
-                        foreach (byte b in socketData.DataBuffer)
-                        {
-
-                            message += Convert.ToChar(b);
-                        }
-
-                        switch (message)
-                        {
-                            case "station":
-
-                                break;
-                            default:
-                                break;
-                        }
-
-                        _receive(socketData.ClientNumber, socketData.DataBuffer, dataSize);
-                    }
                     ((UserSock)workerSockets[socketData.ClientNumber]).ZeroDataCount = 0;
                 }
 
@@ -487,12 +517,12 @@ namespace TCPServer
                 {
                     try
                     {
-                        System.Diagnostics.Debug.WriteLine("SERVER EXCEPTION in OnClientDataReceived, ServerObject removed:(" + se.ErrorCode.ToString() +  ") " + socketData.ClientNumber + ", (happens during a normal client exit)");
+                        System.Diagnostics.Debug.WriteLine("SERVER EXCEPTION in OnClientDataReceived, ServerObject removed:(" + se.ErrorCode.ToString() + ") " + socketData.ClientNumber + ", (happens during a normal client exit)");
                         System.Diagnostics.Debug.WriteLine("RemoteEndPoint: " + workerSockets[socketData.ClientNumber].UserSocket.RemoteEndPoint.ToString());
                         System.Diagnostics.Debug.WriteLine("LocalEndPoint: " + workerSockets[socketData.ClientNumber].UserSocket.LocalEndPoint.ToString());
                     }
                     catch { }
-                    
+
                     //Socket gets closed and removed from OnClientDisconnect
                     if (OnClientDisconnect != null)
                         OnClientDisconnect(socketData.ClientNumber);
@@ -545,7 +575,7 @@ namespace TCPServer
             catch// (Exception ex)
             {
                 //Console.WriteLine("\n\nError in ToFile:\n" + message + "\n" + ex.Message + "\n\n");
-               // System.Windows.Forms.MessageBox.Show("ERROR:\n\n" + ex.Message, "Possible Permissions Issue!");
+                // System.Windows.Forms.MessageBox.Show("ERROR:\n\n" + ex.Message, "Possible Permissions Issue!");
             }
             finally
             {

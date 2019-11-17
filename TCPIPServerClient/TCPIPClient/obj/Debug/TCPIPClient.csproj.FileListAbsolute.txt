@@ -20,4 +20,27 @@ D:\MyDocuments\Visual Studio 2015\Projects\TCPIPServerClient\TCPIPClient\obj\Deb
 D:\MyDocuments\Visual Studio 2015\Projects\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.exe
 D:\MyDocuments\Visual Studio 2015\Projects\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.pdb
 D:\MyDocuments\Visual Studio 2015\Projects\TCPIPServerClient\TCPIPClient\bin\Debug\CommonClassLibs.dll
-D:\SOURCES\TCPIPServerClient\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.csprojAssemblyReference.cache
+D:\TCPIPServerClient\TCPIPClient\bin\Debug\TCPIPClient.exe.config
+D:\TCPIPServerClient\TCPIPClient\bin\Debug\TCPIPClient.exe
+D:\TCPIPServerClient\TCPIPClient\bin\Debug\TCPIPClient.pdb
+D:\TCPIPServerClient\TCPIPClient\bin\Debug\CommonClassLibs.dll
+D:\TCPIPServerClient\TCPIPClient\bin\Debug\CommonClassLibs.pdb
+D:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.Properties.Resources.resources
+D:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.csproj.GenerateResource.cache
+D:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.csproj.CopyComplete
+D:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.exe
+D:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.pdb
+D:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.csprojAssemblyReference.cache
+D:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.ClientForm.resources
+e:\TCPIPServerClient\TCPIPClient\bin\Debug\TCPIPClient.exe
+e:\TCPIPServerClient\TCPIPClient\bin\Debug\TCPIPClient.exe.config
+e:\TCPIPServerClient\TCPIPClient\bin\Debug\TCPIPClient.pdb
+e:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.csprojAssemblyReference.cache
+e:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.ClientForm.resources
+e:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.Properties.Resources.resources
+e:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.csproj.GenerateResource.cache
+e:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.csproj.CopyComplete
+e:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.exe
+e:\TCPIPServerClient\TCPIPClient\obj\Debug\TCPIPClient.pdb
+e:\TCPIPServerClient\TCPIPClient\bin\Debug\CommonClassLibs.dll
+e:\TCPIPServerClient\TCPIPClient\bin\Debug\CommonClassLibs.pdb

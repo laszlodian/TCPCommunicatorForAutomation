@@ -37,18 +37,6 @@ namespace TCPIPServer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Anonymous")]
-        public string ServerUserName {
-            get {
-                return ((string)(this["ServerUserName"]));
-            }
-            set {
-                this["ServerUserName"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
         public string ServerIP {
             get {
@@ -68,6 +56,18 @@ namespace TCPIPServer.Properties {
             }
             set {
                 this["ServerHost"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Anonymous")]
+        public string ServerName {
+            get {
+                return ((string)(this["ServerName"]));
+            }
+            set {
+                this["ServerName"] = value;
             }
         }
     }
